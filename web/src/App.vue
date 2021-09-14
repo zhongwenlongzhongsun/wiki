@@ -2,20 +2,20 @@
   <a-layout>
     <the-header></the-header>
       <router-view/>
-    <a-layout-footer style="text-align: center">
-      Ant Design ©2021 Created by ZhongSun
-    </a-layout-footer>
+    <the-footer></the-footer>
   </a-layout>
 </template>
 
 <script lang="ts">
 import {defineComponent} from 'vue';
 import TheHeader from '@/components/the-header.vue';
+import TheFooter from '@/components/the-footer.vue';
 
 export default defineComponent({
   name: 'app',
   components: {
     TheHeader,
+    TheFooter
   },
 });
 </script>
