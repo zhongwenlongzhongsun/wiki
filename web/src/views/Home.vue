@@ -3,15 +3,13 @@
     <a-layout-sider width="200" style="background: #fff">
       <a-menu
           mode="inline"
-          v-model:selectedKeys="selectedKeys2"
-          v-model:openKeys="openKeys"
           :style="{ height: '100%', borderRight: 0 }"
       >
         <a-sub-menu key="sub1">
           <template #title>
                 <span>
                   <user-outlined/>
-                  subnav 111
+                  subnav 1
                 </span>
           </template>
           <a-menu-item key="1">option1</a-menu-item>
@@ -55,8 +53,17 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'Home',
+
+  //Vue3 新增的初始化方法
+  setup() {
+    console.log("setup");
+    axios.get("http://localhost:8880/ebook/list?name=Spring").then((response) => {// 回调函数
+      console.log(response);
+    })
+  }
 });
 </script>
