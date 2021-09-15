@@ -97,7 +97,7 @@ export default defineComponent({
 
     onMounted(() =>{
       console.log("onMounted");
-      axios.get("http://localhost:8880/ebook/list?name=Spring").then((response) => {// 回调函数
+      axios.get("http://localhost:8880/ebook/list").then((response) => {// 回调函数
         const data = response.data; // data对应CommonResp.java
         ebooks.value = data.content;
         ebooks1.books = data.content;
@@ -113,7 +113,7 @@ export default defineComponent({
         onChange: (page : any)  => {
           console.log(page);
         },
-        pageSize: 3,
+        pageSize: 100,
       },
       actions: [
       { type: 'StarOutlined', text: '156' },
@@ -124,3 +124,13 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+  .ant-avatar-circle {
+    width : 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 8%;
+    margin:  5px 0;
+  }
+</style>
