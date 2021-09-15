@@ -7,6 +7,7 @@ import com.jiawa.wiki.domain.EbookExample;
 import com.jiawa.wiki.mapper.EbookMapper;
 import com.jiawa.wiki.req.EbookReq;
 import com.jiawa.wiki.resp.EbookResp;
+import com.jiawa.wiki.resp.PageResp;
 import com.jiawa.wiki.util.CopyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class EbookService {
     private EbookMapper ebookMapper;
 
     //根据名字模糊查询
-    public List<EbookResp> list(EbookReq req){
+    public PageResp<EbookResp> list(EbookReq req){
 
         EbookExample ebookExample = new EbookExample();
         //createCriteria() 相当于where 条件
@@ -36,7 +37,7 @@ public class EbookService {
             criteria.andNameLike("%" + req.getName() + "%");
         }
 
-        PageHelper.startPage(1, 3); //   分页 （从查找的第几页开始，每页查询的条目数）
+        PageHelper.startPage(req.getPage(), req.getSize()); //   分页 （从查找的第几页开始，每页查询的条目数）
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
@@ -60,6 +61,11 @@ public class EbookService {
 
         //列表复制
         List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
-        return list;
+
+        PageResp<EbookResp> pageResp = new PageResp<>();
+        pageResp.setTotal(pageInfo.getTotal());
+        pageResp.setList(list);
+
+        return pageResp;
     }
 }
