@@ -91,17 +91,14 @@ export default defineComponent({
 
   //Vue3 新增的初始化方法
   setup() {
-    console.log("setup");
     const ebooks = ref();//响应式数据
     const ebooks1 = reactive({books: []});//自定义books对应的值放一个空数组
 
     onMounted(() =>{
-      console.log("onMounted");
       axios.get("/ebook/list").then((response) => {// 回调函数
         const data = response.data; // data对应CommonResp.java
         ebooks.value = data.content;
         ebooks1.books = data.content;
-        console.log(response);
       })
     });
 
