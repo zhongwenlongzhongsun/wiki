@@ -83,7 +83,7 @@ export default defineComponent({
      * 数据查询
      */
     const handleQuery = (params : any) =>{
-      loading.value = false;
+      loading.value = true;
       axios.get("/ebook/list", params).then((response) =>{
         loading.value = false;
         const data = response.data;
@@ -106,7 +106,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      handleQuery(); // 只在方法内部调用不用return
+      handleQuery({}); // 只在方法内部调用不用return
     });
 
     return {

@@ -1,11 +1,15 @@
 package com.jiawa.wiki.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.jiawa.wiki.domain.Ebook;
 import com.jiawa.wiki.domain.EbookExample;
 import com.jiawa.wiki.mapper.EbookMapper;
 import com.jiawa.wiki.req.EbookReq;
 import com.jiawa.wiki.resp.EbookResp;
 import com.jiawa.wiki.util.CopyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -15,12 +19,15 @@ import java.util.List;
 @Service
 public class EbookService {
 
+    private static final Logger LOG = LoggerFactory.getLogger((EbookService.class));
+
 //    @Autowired
     @Resource
     private EbookMapper ebookMapper;
 
     //根据名字模糊查询
     public List<EbookResp> list(EbookReq req){
+
         EbookExample ebookExample = new EbookExample();
         //createCriteria() 相当于where 条件
         EbookExample.Criteria criteria = ebookExample.createCriteria();
@@ -28,7 +35,15 @@ public class EbookService {
         if(!ObjectUtils.isEmpty(req.getName())) {
             criteria.andNameLike("%" + req.getName() + "%");
         }
+
+        PageHelper.startPage(1, 3); //   分页 （从查找的第几页开始，每页查询的条目数）
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
+
+        PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
+        //日志中使用点占位符{}, 而不是用 + 凭借着字符串
+        //点占位符输出 -> 总行数: 5       错误使用 + 拼接  ->   总行数: {}5
+        LOG.info("总行数: {}" , pageInfo.getTotal()); // 获取总行数
+        LOG.info("总页数: {}" , pageInfo.getPages()); // 获取总页数
 
 //        List<EbookResp> respList = new ArrayList<>();
 //        for (Ebook ebook : ebookList) {
