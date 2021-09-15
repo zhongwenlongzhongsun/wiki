@@ -97,7 +97,7 @@ export default defineComponent({
 
     onMounted(() =>{
       console.log("onMounted");
-      axios.get("http://localhost:8880/ebook/list").then((response) => {// 回调函数
+      axios.get(process.env.VUE_APP_SERVER + "/ebook/list").then((response) => {// 回调函数
         const data = response.data; // data对应CommonResp.java
         ebooks.value = data.content;
         ebooks1.books = data.content;
