@@ -1,5 +1,7 @@
 <template>
   <a-layout>
+    <AliwangwangOutlined />
+
     <the-header></the-header>
       <router-view/>
     <the-footer></the-footer>
