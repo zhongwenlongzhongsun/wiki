@@ -30,7 +30,7 @@
       :confirm-loading="modalLoading"
       @ok="handleModalOK"
   >
-    <a-form :model="ebook" :label-col="{ span: 6}" :wrapper-col="{ span: 18 }">
+    <a-form :model="ebook" :label-col="{ span: 6}" :wrapper-col="{span: 18}">
       <a-form-item label="封面">
         <a-input v-model:value="ebook.cover" />
       </a-form-item>
@@ -38,7 +38,7 @@
         <a-input v-model:value="ebook.name" />
       </a-form-item>
       <a-form-item label="分类一">
-        <a-input v-model:value="ebook.catagory1Id" />
+        <a-input v-model:value="ebook.category1Id" />
       </a-form-item>
       <a-form-item label="分类二">
         <a-input v-model:value="ebook.catagory2Id" />
@@ -141,12 +141,20 @@ export default defineComponent({
     const ebook = ref({});
     const modalVisible = ref(false);
     const modalLoading = ref(false);
-    const handleModalOk = () =>{
+    const handleModalOK = () =>{
       modalLoading.value = true;
-      setTimeout(()=>{
-        modalVisible.value = false;
-        modalLoading.value = false;
-      },2000);
+      axios.post("/ebook/save", ebook.value).then((response) =>{
+        const data = response.data;  // data = commonResp
+        if (data.success){
+          modalVisible.value = false;
+          modalLoading.value = false;
+          //重新加载列表
+          handleQuery({
+            page: pagination.value.current,      //保存完重新查询当前页
+            size: pagination.value.pageSize,
+          }); // 只在方法内部调用不用return
+        }
+      });
     };
 
     //编辑
@@ -154,6 +162,7 @@ export default defineComponent({
       modalVisible.value = true;
       ebook.value = record
     }
+
     onMounted(() => {
       handleQuery({
         page: 1,
@@ -171,7 +180,7 @@ export default defineComponent({
       edit,
       modalVisible,
       modalLoading,
-      handleModalOk
+      handleModalOK
     }
   }
 });
