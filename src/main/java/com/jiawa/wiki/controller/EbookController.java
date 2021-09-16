@@ -29,7 +29,7 @@ public class EbookController {
     }
 
     @PostMapping("/save")                   //一般保存类，更新类都用postMapping
-    public CommonResp save(@RequestBody EbookSaveReq req){ //在使用axios提交post请求时，由于以json方式提交所以需要增加@RequestBody注解
+    public CommonResp save(@Valid  @RequestBody EbookSaveReq req){ //在使用axios提交post请求时，由于以json方式提交所以需要增加@RequestBody注解
         CommonResp resp = new CommonResp<>();
         ebookService.save(req);
         return resp;
