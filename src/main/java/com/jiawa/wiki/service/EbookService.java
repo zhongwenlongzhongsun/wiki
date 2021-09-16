@@ -10,6 +10,7 @@ import com.jiawa.wiki.req.EbookSaveReq;
 import com.jiawa.wiki.resp.EbookQueryResp;
 import com.jiawa.wiki.resp.PageResp;
 import com.jiawa.wiki.util.CopyUtil;
+import com.jiawa.wiki.util.SnowFlake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,12 @@ public class EbookService {
     @Resource
     private EbookMapper ebookMapper;
 
-    //根据名字模糊查询
+    @Resource
+    private SnowFlake snowFlake;
+
+    /**
+     *     根据名字模糊查询
+     */
     public PageResp<EbookQueryResp> list(EbookQueryReq req){
 
         EbookExample ebookExample = new EbookExample();
@@ -38,7 +44,7 @@ public class EbookService {
             criteria.andNameLike("%" + req.getName() + "%");
         }
 
-        PageHelper.startPage(req.getPage(), req.getSize()); //   分页 （从查找的第几页开始，每页查询的条目数）
+        PageHelper.startPage(req.getPage(), req.getSize()); //分页 （从查找的第几页开始，每页查询的条目数）
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
@@ -70,11 +76,15 @@ public class EbookService {
         return pageResp;
     }
 
-    //保存
+    /**
+     *  保存
+     */
+
     public void save(EbookSaveReq req){
         Ebook ebook = CopyUtil.copy(req, Ebook.class);
         if(ObjectUtils.isEmpty(req.getId())){
             //新增
+            ebook.setId(snowFlake.nextId());
             ebookMapper.insert(ebook);
         }else{
             //更新
