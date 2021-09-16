@@ -6,7 +6,6 @@
         mode="horizontal"
         :style="{ lineHeight: '64px' }"
     >
-
       <a-menu-item key="/">
         <router-link to="/"><HomeOutlined />首页</router-link>
       </a-menu-item>
