@@ -16,7 +16,7 @@
         </template>
         <template v-slot:action="{ text, record}">
           <a-space size="small">
-            <a-button type="primary" @click="edit">编辑</a-button>
+            <a-button type="primary" @click="edit(record)">编辑</a-button>
             <a-button type="danger">删除</a-button>
           </a-space>
         </template>
@@ -30,7 +30,23 @@
       :confirm-loading="modalLoading"
       @ok="handleModalOK"
   >
-    <p>test</p>
+    <a-form :model="ebook" :label-col="{ span: 6}" :wrapper-col="{ span: 18 }">
+      <a-form-item label="封面">
+        <a-input v-model:value="ebook.cover" />
+      </a-form-item>
+      <a-form-item label="名称">
+        <a-input v-model:value="ebook.name" />
+      </a-form-item>
+      <a-form-item label="分类一">
+        <a-input v-model:value="ebook.catagory1Id" />
+      </a-form-item>
+      <a-form-item label="分类二">
+        <a-input v-model:value="ebook.catagory2Id" />
+      </a-form-item>
+      <a-form-item label="描述">
+        <a-input v-model:value="ebook.desc" type="textarea"/>
+      </a-form-item>
+    </a-form>
   </a-modal>
 </template>
 
@@ -122,6 +138,7 @@ export default defineComponent({
     };
 
     // --表单--
+    const ebook = ref({});
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleModalOk = () =>{
@@ -133,8 +150,9 @@ export default defineComponent({
     };
 
     //编辑
-    const edit = () =>{
+    const edit = (record : any) =>{
       modalVisible.value = true;
+      ebook.value = record
     }
     onMounted(() => {
       handleQuery({
@@ -144,6 +162,7 @@ export default defineComponent({
     });
 
     return {
+      ebook,
       ebooks,
       pagination,
       columns,
