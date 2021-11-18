@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 
 
 @RestController //返回字符串
@@ -20,6 +21,13 @@ public class CategoryController {
     @Resource
     private CategoryService categoryService;
 
+    @GetMapping("/all")
+    public CommonResp all() { // 开启校验规则
+        CommonResp<List<CategoryQueryResp>> resp = new CommonResp<>();
+        List<CategoryQueryResp> list = categoryService.all();
+        resp.setContent(list);
+        return resp;
+    }
     @GetMapping("/list")
     public CommonResp list(@Valid CategoryQueryReq req) { // 开启校验规则
         CommonResp<PageResp<CategoryQueryResp>> resp = new CommonResp<>();
@@ -41,4 +49,5 @@ public class CategoryController {
         categoryService.delete(id);
         return resp;
     }
+
 }

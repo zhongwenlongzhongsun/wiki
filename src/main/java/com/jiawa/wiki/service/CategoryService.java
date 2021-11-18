@@ -37,6 +37,7 @@ public class CategoryService {
     public PageResp<CategoryQueryResp> list(CategoryQueryReq req){
 
         CategoryExample categoryExample = new CategoryExample();
+        categoryExample.setOrderByClause("sort asc");
         //createCriteria() 相当于where 条件
         CategoryExample.Criteria criteria = categoryExample.createCriteria();
 
@@ -70,6 +71,17 @@ public class CategoryService {
         pageResp.setList(list);
 
         return pageResp;
+    }
+    public List<CategoryQueryResp> all(){
+
+        CategoryExample categoryExample = new CategoryExample();
+        categoryExample.setOrderByClause("sort asc");
+        List<Category> categoryList = categoryMapper.selectByExample(categoryExample);
+
+        //列表复制
+        List<CategoryQueryResp> list = CopyUtil.copyList(categoryList, CategoryQueryResp.class);
+
+        return list;
     }
 
     /**
