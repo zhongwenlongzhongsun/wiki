@@ -6,8 +6,7 @@
       <p>
         <a-form layout="inline" :model="param">
           <a-form-item>
-            <a-input v-model:value="param.name" placeholder="   名称">
-              <template #prefix><QuestionCircleOutlined style="color: rgba(0, 0, 0, 0.25)"/></template>
+            <a-input v-model:value="param.name" placeholder="名称">
             </a-input>
           </a-form-item>
           <a-form-item>
@@ -32,6 +31,9 @@
       >
         <template #cover="{text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" style="width: 60px; height: 60px"/>
+        </template>
+        <template v-slot:category="{ text, record }">
+          <span>{{ getCategoryName(record.category1Id) }} / {{ getCategoryName(record.category2Id) }}</span>
         </template>
         <template v-slot:action="{ text, record}">
           <a-space size="small">
@@ -65,11 +67,12 @@
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name" />
       </a-form-item>
-      <a-form-item label="分类一">
-        <a-input v-model:value="ebook.category1Id" />
-      </a-form-item>
-      <a-form-item label="分类二">
-        <a-input v-model:value="ebook.category2Id" />
+      <a-form-item label="分类">
+        <a-cascader
+            v-model:value="categoryIds"
+            :field-names="{ label: 'name', value: 'id', children: 'children' }"
+            :options="level1"
+        />
       </a-form-item>
       <a-form-item label="描述">
         <a-input v-model:value="ebook.description" type="textarea"/>
@@ -85,16 +88,17 @@ import axios from 'axios';
 import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
 
+
 export default defineComponent({
   name: 'AdminEbook',
   //Vue3 新增的初始化方法
-  setup() {
+  setup: function () {
     const param = ref();
     param.value = {};
     const ebooks = ref();//响应式数据
     const pagination = ref({
       current: 1,
-      pageSize: 5,
+      pageSize: 4,
       total: 0
     });
     const loading = ref(false);
@@ -103,21 +107,15 @@ export default defineComponent({
       {
         title: '封面',
         dataIndex: 'cover',
-        slots: { customRender: 'cover' }
+        slots: {customRender: 'cover'}
       },
       {
         title: '名称',
         dataIndex: 'name'
       },
       {
-        title: '分类一',
-        key: 'category1Id',
-        dataIndex: 'category1Id'
-      },
-      {
-        title: '分类二',
-        key: 'category2Id',
-        dataIndex: 'category2Id'
+        title: '分类',
+        slots: { customRender: 'category'}
       },
       {
         title: '文档数',
@@ -134,14 +132,14 @@ export default defineComponent({
       {
         title: 'Action',
         key: 'action',
-        slots: { customRender: 'action' }
+        slots: {customRender: 'action'}
       },
     ];
 
     /**
      * 数据查询
      */
-    const handleQuery = (params : any) =>{
+    const handleQuery = (params: any) => {
       loading.value = true;
       axios.get("/ebook/list", {
         params: {
@@ -149,16 +147,16 @@ export default defineComponent({
           size: params.size,
           name: param.value.name
         }
-      }).then((response) =>{
+      }).then((response) => {
         loading.value = false;
         const data = response.data;
-        if (data.success){
+        if (data.success) {
           ebooks.value = data.content.list;
 
           //重置分页按钮
           pagination.value.current = params.page;
           pagination.value.total = data.content.total;
-        }else{
+        } else {
           message.error(data.message);
         }
       });
@@ -176,15 +174,21 @@ export default defineComponent({
     };
 
     // --表单--
-    const ebook = ref({});
+    /**
+     * 数组 [100,101] 对应前端开发 / Vue
+     */
+    const categoryIds = ref();
+    const ebook = ref();
     const modalVisible = ref(false);
     const modalLoading = ref(false);
-    const handleModalOK = () =>{
+    const handleModalOK = () => {
       modalLoading.value = true;
-      axios.post("/ebook/save", ebook.value).then((response) =>{
+      ebook.value.category1Id = categoryIds.value[0];
+      ebook.value.category2Id = categoryIds.value[1];
+      axios.post("/ebook/save", ebook.value).then((response) => {
         modalLoading.value = false;
         const data = response.data;  // data = commonResp
-        if (data.success){
+        if (data.success) {
           modalVisible.value = false;
 
           //重新加载列表
@@ -192,16 +196,17 @@ export default defineComponent({
             page: pagination.value.current,      //保存完重新查询当前页
             size: pagination.value.pageSize,
           }); // 只在方法内部调用不用return
-        }else{
+        } else {
           message.error(data.message);
         }
       });
     };
 
     //编辑
-    const edit = (record : any) => {
+    const edit = (record: any) => {
       modalVisible.value = true;
       ebook.value = Tool.copy(record);
+      categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
     }
 
     //新增
@@ -211,10 +216,10 @@ export default defineComponent({
     }
 
     //删除(long类型对应的前端类型是number)
-    const handleDelete = (id : number) =>{
-      axios.delete("/ebook/delete/" + id).then((response) =>{
+    const handleDelete = (id: number) => {
+      axios.delete("/ebook/delete/" + id).then((response) => {
         const data = response.data;  // data = commonResp
-        if (data.success){
+        if (data.success) {
           modalVisible.value = false;
           modalLoading.value = false;
           //重新加载列表
@@ -226,10 +231,46 @@ export default defineComponent({
       });
     };
 
+    const level1 = ref();
+    let categorys: any;
+    /**
+     * 查询所有分类
+     **/
+    const handleQueryCategory = () => {
+      loading.value = true;
+      axios.get("/category/all").then((response) => {
+        loading.value = false;
+        const data = response.data;
+        if (data.success) {
+          categorys = data.content;
+          console.log("原始数组：", categorys);
+
+          level1.value = [];
+          level1.value = Tool.array2Tree(categorys, 0);
+          console.log("树形结构：", level1.value);
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
+    const getCategoryName = (cid: number) => {
+      // console.log(cid)
+      let result = "";
+      categorys.forEach((item: any) => {
+        if (item.id === cid) {
+          // return item.name; // 注意，这里直接return不起作用
+          result = item.name;
+        }
+      });
+      return result;
+    };
+
     onMounted(() => {
+      handleQueryCategory();
       handleQuery({
         page: 1,
-        size: pagination.value.pageSize
+        size: pagination.value.pageSize      //响应式变量
       }); // 只在方法内部调用不用return
     });
 
@@ -240,8 +281,11 @@ export default defineComponent({
       pagination,
       columns,
       loading,
+      level1,
+
       handleTableChange,
       handleQuery,
+      getCategoryName,
 
       edit,
       add,
@@ -249,8 +293,10 @@ export default defineComponent({
       ebook,
       modalVisible,
       modalLoading,
+      categoryIds,
       handleModalOK,
       handleDelete,
+
 
     }
   }
