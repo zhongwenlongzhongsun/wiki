@@ -7,19 +7,18 @@
           @click="handleClick"
       >
         <a-menu-item key="welcome">
-          <router-link :to="'/'">
-            <MailOutlined />
-            <span>欢迎</span>
-          </router-link>
+          <MailOutlined/>
+          <span>欢迎</span>
         </a-menu-item>
-<!--        一级菜单-->
+        <!--        一级菜单-->
         <a-sub-menu v-for="item in level1" :key="item.id">
           <template v-slot:title>
-            <span><user-outlined />{{item.name}}</span>
+            <span><user-outlined/>{{ item.name }}</span>
           </template>
-<!--          二级菜单-->
+          <!--          二级菜单-->
           <a-menu-item v-for="child in item.children" :key="child.id">
-            <MailOutlined /><span>{{child.name}}</span>
+            <MailOutlined/>
+            <span>{{ child.name }}</span>
           </a-menu-item>
         </a-sub-menu>
       </a-menu>
@@ -27,13 +26,17 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '540px' }"
     >
-      <a-list item-layout="vertical" size="large" :grid="{ gutter: 16, column: 3 }" :pagination="pagination" :data-source="ebooks">
+      <div class="welcome" v-show="isShowWelcome">
+        <h1>欢迎使用wiki知识库</h1>
+      </div>
+      <a-list v-show="!isShowWelcome" item-layout="vertical" size="large" :grid="{ gutter: 16, column: 3 }"
+              :pagination="pagination" :data-source="ebooks">
         <!-- 循环将每个ebooks 里面的电子书设置成 item变量       -->
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
               <span v-for="{ type, text } in actions" :key="type">
-                <component v-bind:is="type" style="margin-right: 8px" />
+                <component v-bind:is="type" style="margin-right: 8px"/>
                 {{ text }}
               </span>
             </template>
@@ -41,7 +44,9 @@
               <template #title>
                 <a :href="item.href">{{ item.name }}</a>
               </template>
-              <template #avatar><a-avatar :src="item.cover" /></template>
+              <template #avatar>
+                <a-avatar :src="item.cover"/>
+              </template>
             </a-list-item-meta>
           </a-list-item>
         </template>
@@ -53,7 +58,7 @@
 <script lang="ts">
 import {defineComponent, onMounted, reactive, ref} from 'vue';
 import axios from 'axios';
-import{ message } from 'ant-design-vue';
+import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
 
 // const listData : any = [];
@@ -98,40 +103,57 @@ export default defineComponent({
       });
     };
 
-    const handleClick = () => {
-      console.log("menu click");
-    }
+    const isShowWelcome = ref(true); //由于div与a-list存在互斥，所以设置一个响应式变量解决互斥问题
+    let categoryId2 = 0;
 
-    onMounted(() => {
-      handleQueryCategory();
-      axios.get("/ebook/list",{
-        params:{
+    const handleQueryEbook = () => {     //设置成公共的参数，进行自动刷新
+      axios.get("/ebook/list", {
+        params: {
           page: 1,
-          size:1000
+          size: 1000,
+          categoryId2: categoryId2    //通过二级分类查询
         }
       }).then((response) => {// 回调函数
         const data = response.data; // data对应CommonResp.java
         ebooks.value = data.content.list;
         // ebooks1.books = data.content;
-      })
+      });
+    };
+
+    const handleClick = (value: any) => {
+      // console.log("menu click",value);
+      if (value.key === 'welcome') {
+        isShowWelcome.value = true;
+      } else {
+        categoryId2 = value.key;
+        isShowWelcome.value = false;
+        handleQueryEbook();   //点击分类才调用查询电子书
+      }
+      // isShowWelcome.value = value.key === 'welcome';
+    };
+
+    onMounted(() => {
+      handleQueryCategory();
     });
 
-    return{
+    return {
       ebooks,
       level1,
       handleClick,
+      isShowWelcome,
+
       // book: toRef(ebooks1, "books"),
       // listData,
       pagination: {
-        onChange: (page : any)  => {
+        onChange: (page: any) => {
           console.log(page);
         },
         pageSize: 100,
       },
       actions: [
-      { type: 'StarOutlined', text: '156' },
-      { type: 'LikeOutlined', text: '156' },
-      { type: 'MessageOutlined', text: '2' },
+        {type: 'StarOutlined', text: '156'},
+        {type: 'LikeOutlined', text: '156'},
+        {type: 'MessageOutlined', text: '2'},
       ],
     }
   }
@@ -139,11 +161,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
-  .ant-avatar-circle {
-    width : 50px;
-    height: 50px;
-    line-height: 50px;
-    border-radius: 8%;
-    margin:  5px 0;
-  }
+.ant-avatar-circle {
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  border-radius: 8%;
+  margin: 5px 0;
+}
 </style>

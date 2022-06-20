@@ -43,10 +43,13 @@ public class EbookService {
         if(!ObjectUtils.isEmpty(req.getName())) {
             criteria.andNameLike("%" + req.getName() + "%");
         }
+        if(!ObjectUtils.isEmpty(req.getCategoryId2())) {  //long类型就不用加 %
+            criteria.andCategory2IdEqualTo(req.getCategoryId2());
+        }
 
         PageHelper.startPage(req.getPage(), req.getSize()); //分页 （从查找的第几页开始，每页查询的条目数）
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
-
+        //泛型对应列表实际的类
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
         //日志中使用点占位符{}, 而不是用 + 凭借着字符串
         //点占位符输出 -> 总行数: 5       错误使用 + 拼接  ->   总行数: {}5
