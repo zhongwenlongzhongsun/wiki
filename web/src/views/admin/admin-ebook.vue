@@ -238,7 +238,9 @@ export default defineComponent({
      **/
     const handleQueryCategory = () => {
       loading.value = true;
-      axios.get("/category/all").then((response) => {
+      // 如果不清空现有数据，则编辑保存重新加载数据后，再点编辑，则列表显示的还是编辑前的数据
+      level1.value = [];
+      axios.get("/category/all").then((response) => { //axios是异步的，handlequery 和 handlequeryCategory 也是异步的
         loading.value = false;
         const data = response.data;
         if (data.success) {
@@ -248,6 +250,12 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(categorys, 0);
           console.log("树形结构：", level1.value);
+
+          //加载完分类后，再加载电子书，否则分类树加载慢，电子书渲染会报错
+          handleQuery({         //先加载handlequery，后加载 handlequerycategory
+            page: 1,
+            size: pagination.value.pageSize      //响应式变量
+          }); // 只在方法内部调用不用return
         } else {
           message.error(data.message);
         }
@@ -259,7 +267,7 @@ export default defineComponent({
       let result = "";
       categorys.forEach((item: any) => {
         if (item.id === cid) {
-          // return item.name; // 注意，这里直接return不起作用
+          // return item.name; // 这里直接return不起作用
           result = item.name;
         }
       });
@@ -268,10 +276,6 @@ export default defineComponent({
 
     onMounted(() => {
       handleQueryCategory();
-      handleQuery({
-        page: 1,
-        size: pagination.value.pageSize      //响应式变量
-      }); // 只在方法内部调用不用return
     });
 
 
