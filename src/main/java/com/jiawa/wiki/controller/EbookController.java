@@ -12,8 +12,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 
-@RestController //返回字符串
-// @Controller  // 返回页面
+@RestController
 @RequestMapping("/ebook")
 public class EbookController {
 
@@ -21,22 +20,22 @@ public class EbookController {
     private EbookService ebookService;
 
     @GetMapping("/list")
-    public CommonResp list(@Valid  EbookQueryReq req){ // 开启校验规则
+    public CommonResp list(@Valid EbookQueryReq req) {
         CommonResp<PageResp<EbookQueryResp>> resp = new CommonResp<>();
         PageResp<EbookQueryResp> list = ebookService.list(req);
         resp.setContent(list);
         return resp;
     }
 
-    @PostMapping("/save")                   //一般保存类，更新类都用postMapping
-    public CommonResp save(@Valid  @RequestBody EbookSaveReq req){ //在使用axios提交post请求时，由于以json方式提交所以需要增加@RequestBody注解
+    @PostMapping("/save")
+    public CommonResp save(@Valid @RequestBody EbookSaveReq req) {
         CommonResp resp = new CommonResp<>();
         ebookService.save(req);
         return resp;
     }
 
-    @DeleteMapping("/delete/{id}")                   //resful风格
-    public CommonResp delete(@PathVariable Long id){ //在使用axios提交post请求时，由于以json方式提交所以需要增加@RequestBody注解
+    @DeleteMapping("/delete/{id}")
+    public CommonResp delete(@PathVariable Long id) {
         CommonResp resp = new CommonResp<>();
         ebookService.delete(id);
         return resp;

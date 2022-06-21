@@ -11,7 +11,7 @@ export class Tool {
   }
 
   /**
-   * 非空校验
+   * 非空校验（将对象转成json字符串，再将json字符串转成对象）
    */
   public static isNotEmpty(obj: any) {
     return !this.isEmpty(obj);
