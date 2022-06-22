@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -43,11 +44,12 @@ public class DocController {
         return resp;
     }
 
-    @DeleteMapping("/delete/{id}")                   //resful风格
-    public CommonResp delete(@PathVariable Long id) { //在使用axios提交post请求时，由于以json方式提交所以需要增加@RequestBody注解
+
+    @DeleteMapping("/delete/{idsStr}")                     //resful风格
+    public CommonResp delete(@PathVariable String idsStr) {//在使用axios提交post请求时，由于以json方式提交所以需要增加@RequestBody注解
         CommonResp resp = new CommonResp<>();
-        docService.delete(id);
+        List<String> list = Arrays.asList(idsStr.split(","));//将string转成list数组
+        docService.delete(list);
         return resp;
     }
-
 }

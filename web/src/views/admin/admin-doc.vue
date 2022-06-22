@@ -100,11 +100,12 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref} from 'vue';
+import {defineComponent, onMounted, ref, createVNode} from 'vue';
 import axios from 'axios';
-import {message} from 'ant-design-vue';
+import {message, Modal} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
 import {useRoute} from "vue-router";
+import ExclamationCircleOutlined from "@ant-design/icons-vue/ExclamationCircleOutlined";
 
 export default defineComponent({
   name: 'AdminDoc',
@@ -225,10 +226,46 @@ export default defineComponent({
             }
           }
         } else {
-          // 如果当前节点不是目标节点，则到其子节点再找找看。
+          // 如果当前节点不是目标节点，则再找到其子节点
           const children = node.children;
           if (Tool.isNotEmpty(children)) {
             setDisable(children, id);
+          }
+        }
+      }
+    };
+
+    // const ids: Array<string> = [];
+    const deleteIds: Array<string> = [];
+    const deleteNames: Array<string> = [];
+    /**
+     * 查找整个树枝
+     */
+    const getDeleteIds = (treeSelectData: any, id: any) => {
+      // console.log(treeSelectData, id);
+      // 遍历数组，即遍历某一层节点
+      for (let i = 0; i < treeSelectData.length; i++) {
+        const node = treeSelectData[i];
+        if (node.id === id) {
+          // 如果当前节点就是目标节点
+          console.log("delete", node);
+          // 将目标id放入结果集ids
+          // ids.push(node.id); //id也行
+          deleteIds.push(id);
+          deleteNames.push(node.name);
+
+          // 遍历所有子节点
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              getDeleteIds(children, children[j].id)      //在children数组里找到对应的id，递归调用
+            }
+          }
+        } else {
+          // 如果当前节点不是目标节点，则再找到其子节点
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            getDeleteIds(children, id);
           }
         }
       }
@@ -266,14 +303,34 @@ export default defineComponent({
     };
 
     const handleDelete = (id: number) => {
-      axios.delete("/doc/delete/" + id).then((response) => {
-        const data = response.data; // data = commonResp
-        if (data.success) {
-          // 重新加载列表
-          handleQuery();
-        } else {
-          message.error(data.message);
-        }
+      // 清空数组，否则多次删除时，数组会一直增加
+      deleteIds.length = 0;
+      deleteNames.length = 0;
+      // console.log(level1.value, id);
+      getDeleteIds(level1.value, id);//整棵树的数据， 查找这个目标id的整个树枝
+      // // console.log(ids);
+      // //将ids变成字符串
+      // axios.delete("/doc/delete/" + ids.join(",")).then((response) => {
+      //   const data = response.data; // data = commonResp
+      //   if (data.success) {
+      //     // 重新加载列表
+      //     handleQuery();
+      //   } else {
+      //     message.error(data.message);
+      //   }
+        Modal.confirm({
+          title: '重要提醒',
+          icon: createVNode(ExclamationCircleOutlined),
+          content: '将删除：【' + deleteNames.join(",") + "】删除后不可恢复，确认删除？",
+          onOk() {
+            // console.log(ids)
+            axios.delete("/doc/delete/" + deleteIds.join(",")).then((response) => {
+            const data = response.data; // data = commonResp
+                if (data.success)
+                // 重新加载列表
+                handleQuery();
+            });
+        },
       });
     };
 
@@ -298,7 +355,8 @@ export default defineComponent({
       handleModalOk,
       treeSelectData,
       handleDelete,
-      setDisable
+      setDisable,
+      getDeleteIds
     }
   }
 });
