@@ -68,18 +68,18 @@
       <a-form-item label="名称">
         <a-input v-model:value="doc.name" />
       </a-form-item>
-      <a-form-item label="名称">
-        <a-tree-select
-            v-model:value="doc.parent"
-            style="width: 100%"
-            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-            :tree-data="level1"
-            placeholder="请选择父文档"
-            tree-default-expand-all
-            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
-        >
-        </a-tree-select>
-      </a-form-item>
+<!--      <a-form-item label="名称">-->
+<!--        <a-tree-select-->
+<!--            v-model:value="doc.parent"-->
+<!--            style="width: 100%"-->
+<!--            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"-->
+<!--            :tree-data="level1"-->
+<!--            placeholder="请选择父文档"-->
+<!--            tree-default-expand-all-->
+<!--            :replaceFields="{title: 'name', key: 'id', value: 'id'}"-->
+<!--        >-->
+<!--        </a-tree-select>-->
+<!--      </a-form-item>-->
       <a-form-item label="父文档">
         <a-tree-select
             v-model:value="doc.parent"
@@ -104,10 +104,19 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
 import {message} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
+import {useRoute} from "vue-router";
 
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
+    const route = useRoute();
+    console.log("路由: ", route);
+    console.log("route.path: ", route.path);
+    console.log("route.query: ", route.query);
+    console.log("route.param: ", route.params);
+    console.log("route.fullPath: ", route.fullPath); //包括path+query参数
+    console.log("route.name: ", route.name);
+    console.log("route.meta: ", route.meta);
     const param = ref();
     param.value = {};
     const docs = ref();
@@ -246,7 +255,9 @@ export default defineComponent({
      */
     const add = () => {
       modalVisible.value = true;
-      doc.value = {};
+      doc.value = {
+        ebookId: route.query.ebookId
+      };
 
       treeSelectData.value = Tool.copy(level1.value);
 
