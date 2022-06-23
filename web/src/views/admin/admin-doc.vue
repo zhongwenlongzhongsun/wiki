@@ -55,6 +55,7 @@
           </a-space>
         </template>
       </a-table>
+
     </a-layout-content>
   </a-layout>
 
@@ -66,20 +67,8 @@
   >
     <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
       <a-form-item label="名称">
-        <a-input v-model:value="doc.name" />
+        <a-input v-model:value="doc.name" placeholder="名称"/>
       </a-form-item>
-<!--      <a-form-item label="名称">-->
-<!--        <a-tree-select-->
-<!--            v-model:value="doc.parent"-->
-<!--            style="width: 100%"-->
-<!--            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"-->
-<!--            :tree-data="level1"-->
-<!--            placeholder="请选择父文档"-->
-<!--            tree-default-expand-all-->
-<!--            :replaceFields="{title: 'name', key: 'id', value: 'id'}"-->
-<!--        >-->
-<!--        </a-tree-select>-->
-<!--      </a-form-item>-->
       <a-form-item label="父文档">
         <a-tree-select
             v-model:value="doc.parent"
@@ -93,7 +82,10 @@
         </a-tree-select>
       </a-form-item>
       <a-form-item label="顺序">
-        <a-input v-model:value="doc.sort" />
+        <a-input v-model:value="doc.sort" placeholder="顺序"/>
+      </a-form-item>
+      <a-form-item label="内容">
+        <div id="content"></div>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -106,6 +98,7 @@ import {message, Modal} from 'ant-design-vue';
 import {Tool} from "@/util/tool";
 import {useRoute} from "vue-router";
 import ExclamationCircleOutlined from "@ant-design/icons-vue/ExclamationCircleOutlined";
+import E from 'wangeditor';
 
 export default defineComponent({
   name: 'AdminDoc',
@@ -183,6 +176,7 @@ export default defineComponent({
 
     // -------- 表单 ---------
     //因为树选择组件的属性状态，会随当前编辑的节点而变化，所以单独声明一个响应式变量
+
     const treeSelectData = ref();
     treeSelectData.value = [];
     const doc = ref({});
@@ -271,7 +265,6 @@ export default defineComponent({
       }
     };
 
-
     /**
      * 编辑
      */
@@ -285,7 +278,23 @@ export default defineComponent({
 
       // 为选择树添加一个"无"   //unshift: 在数组前面添加元素
       treeSelectData.value.unshift({id: 0, name: '无'});
+      setTimeout(function () {
+        if (editor == null) {
+          createEditor();
+        }else {
+          editor.destroy();//这里做了一次判断，判断编辑器是否被创建，如果创建了就先销毁。
+          createEditor();
+        }
+      },100);
     };
+
+    // 创建编辑器
+    let editor:any;
+
+    const createEditor = () => {
+      editor = new E('#content');
+      editor.create();
+    }
 
     /**
      * 新增
@@ -300,6 +309,15 @@ export default defineComponent({
 
       // 为选择树添加一个"无"   //unshift: 在数组前面添加元素
       treeSelectData.value.unshift({id: 0, name: '无'});
+      setTimeout(function () {
+        if (editor == null) {
+          createEditor();
+        }else {
+          editor.destroy();//这里做了一次判断，判断编辑器是否被创建，如果创建了就先销毁。
+          createEditor();
+        }
+      })
+
     };
 
     const handleDelete = (id: number) => {
@@ -335,6 +353,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
+      createEditor();
       handleQuery();
     });
 
