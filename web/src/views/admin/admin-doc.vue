@@ -3,92 +3,104 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <p>
-        <a-form layout="inline" :model="param">
-          <a-form-item>
-            <a-button type="primary" @click="handleQuery()">
-              查询
-            </a-button>
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" @click="add()">
-              新增
-            </a-button>
-          </a-form-item>
-        </a-form>
-      </p>
-      <p>
-        <a-alert
-            class="tip"
-            message="小提示：这里的文档会显示到首页的侧边菜单"
-            type="info"
-            closable
-        />
-      </p>
-      <a-table
-          v-if="level1.length > 0"
-          :columns="columns"
-          :row-key="record => record.id"
-          :data-source="level1"
-          :loading="loading"
-          :pagination="false"
-          :defaultExpandAllRows="true"
-      >
-        <template #cover="{ text: cover }">
-          <img v-if="cover" :src="cover" alt="avatar" />
-        </template>
-        <template v-slot:action="{ text, record }">
-          <a-space size="small">
-            <a-button type="primary" @click="edit(record)">
-              编辑
-            </a-button>
-            <a-popconfirm
-                title="删除后不可恢复，确认删除?"
-                ok-text="是"
-                cancel-text="否"
-                @confirm="handleDelete(record.id)"
-            >
-              <a-button type="danger">
-                删除
-              </a-button>
-            </a-popconfirm>
-          </a-space>
-        </template>
-      </a-table>
+      <a-row :gutter="24"><!--使用 (16+8n)px 作为栅格间隔(n 是自然数)。-->
+        <a-col :span="10">
+          <p>
+            <a-form layout="inline" :model="param">
+              <a-form-item>
+                <a-button type="primary" @click="handleQuery()">
+                  查询
+                </a-button>
+              </a-form-item>
+              <a-form-item>
+                <a-button type="primary" @click="add()">
+                  新增
+                </a-button>
+              </a-form-item>
+            </a-form>
+          </p>
+          <p>
+          </p>
+          <a-table
+              v-if="level1.length > 0"
+              :columns="columns"
+              :row-key="record => record.id"
+              :data-source="level1"
+              :loading="loading"
+              :pagination="false"
+              :defaultExpandAllRows="true"
+              size="small"
+          >
+            <template #name="{ text , record }">
+              {{record.sort}} {{text}} <!-- 渲染【顺序， 电子书名字】 -->
+            </template>
+            <template v-slot:action="{ text, record }">
+              <a-space size="small">
+                <a-button type="primary" @click="edit(record)" size="small">
+                  编辑
+                </a-button>
+                <a-popconfirm
+                    title="删除后不可恢复，确认删除?"
+                    ok-text="是"
+                    cancel-text="否"
+                    @confirm="handleDelete(record.id)"
+                >
+                  <a-button type="danger" size="small">
+                    删除
+                  </a-button>
+                </a-popconfirm>
+              </a-space>
+            </template>
+          </a-table>
+        </a-col>
+        <a-col :span="1489">
+          <p>
+            <a-form layout="inline" :model="param">
+              <a-form-item>
+                <a-button type="primary" @click="handleSave()">
+                  保存
+                </a-button>
+              </a-form-item>
+            </a-form>
+          </p>
+          <a-form :model="doc" layout="vertical">
+            <a-form-item>
+              <a-input v-model:value="doc.name" placeholder="名称"/>
+            </a-form-item>
+            <a-form-item>
+              <a-tree-select
+                  v-model:value="doc.parent"
+                  style="width: 100%"
+                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                  :tree-data="treeSelectData"
+                  placeholder="请选择父文档"
+                  tree-default-expand-all
+                  :replaceFields="{title: 'name', key: 'id', value: 'id'}"
+              >
+              </a-tree-select>
+            </a-form-item>
+            <a-form-item>
+              <a-input v-model:value="doc.sort" placeholder="顺序"/>
+            </a-form-item>
+            <a-form-item>
+              <div id="content"></div>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
+
 
     </a-layout-content>
   </a-layout>
 
-  <a-modal
-      title="文档表单"
-      v-model:visible="modalVisible"
-      :confirm-loading="modalLoading"
-      @ok="handleModalOk"
-  >
-    <a-form :model="doc" :label-col="{ span: 6 }" :wrapper-col="{ span: 18 }">
-      <a-form-item label="名称">
-        <a-input v-model:value="doc.name" placeholder="名称"/>
-      </a-form-item>
-      <a-form-item label="父文档">
-        <a-tree-select
-            v-model:value="doc.parent"
-            style="width: 100%"
-            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-            :tree-data="treeSelectData"
-            placeholder="请选择父文档"
-            tree-default-expand-all
-            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
-        >
-        </a-tree-select>
-      </a-form-item>
-      <a-form-item label="顺序">
-        <a-input v-model:value="doc.sort" placeholder="顺序"/>
-      </a-form-item>
-      <a-form-item label="内容">
-        <div id="content"></div>
-      </a-form-item>
-    </a-form>
-  </a-modal>
+<!--  <a-modal-->
+<!--      title="文档表单"-->
+<!--      v-model:visible="modalVisible"-->
+<!--      :confirm-loading="modalLoading"-->
+<!--      @ok="handleSave"-->
+<!--  >-->
+<!--    -->
+<!--  </a-modal>-->
 </template>
 
 <script lang="ts">
@@ -119,17 +131,18 @@ export default defineComponent({
     const columns = [
       {
         title: '名称',
-        dataIndex: 'name'
+        dataIndex: 'name',
+        slots: {customRender: 'name'}
       },
       // {
       //   title: '父文档',
       //   key: 'parent',
       //   dataIndex: 'parent'
       // },
-      {
-        title: '顺序',
-        dataIndex: 'sort'
-      },
+      // {
+      //   title: '顺序',
+      //   dataIndex: 'sort'
+      // },
       {
         title: 'Action',
         key: 'action',
@@ -182,7 +195,7 @@ export default defineComponent({
     const doc = ref({});
     const modalVisible = ref(false);
     const modalLoading = ref(false);
-    const handleModalOk = () => {
+    const handleSave = () => {
       modalLoading.value = true;
       axios.post("/doc/save", doc.value).then((response) => {
         modalLoading.value = false;
@@ -278,14 +291,14 @@ export default defineComponent({
 
       // 为选择树添加一个"无"   //unshift: 在数组前面添加元素
       treeSelectData.value.unshift({id: 0, name: '无'});
-      setTimeout(function () {
-        if (editor == null) {
-          createEditor();
-        }else {
-          editor.destroy();//这里做了一次判断，判断编辑器是否被创建，如果创建了就先销毁。
-          createEditor();
-        }
-      },100);
+      // setTimeout(function () {
+      //   if (editor == null) {
+      //     createEditor();
+      //   }else {
+      //     editor.destroy();//这里做了一次判断，判断编辑器是否被创建，如果创建了就先销毁。
+      //     createEditor();
+      //   }
+      // },100);
     };
 
     // 创建编辑器
@@ -293,6 +306,7 @@ export default defineComponent({
 
     const createEditor = () => {
       editor = new E('#content');
+      editor.config.zIndex = 0; //防止富文本显示在顶层
       editor.create();
     }
 
@@ -309,15 +323,14 @@ export default defineComponent({
 
       // 为选择树添加一个"无"   //unshift: 在数组前面添加元素
       treeSelectData.value.unshift({id: 0, name: '无'});
-      setTimeout(function () {
-        if (editor == null) {
-          createEditor();
-        }else {
-          editor.destroy();//这里做了一次判断，判断编辑器是否被创建，如果创建了就先销毁。
-          createEditor();
-        }
-      })
-
+      // setTimeout(function () {
+      //   if (editor == null) {
+      //     createEditor();
+      //   }else {
+      //     editor.destroy();//这里做了一次判断，判断编辑器是否被创建，如果创建了就先销毁。
+      //     createEditor();
+      //   }
+      // })
     };
 
     const handleDelete = (id: number) => {
@@ -371,7 +384,7 @@ export default defineComponent({
       doc,
       modalVisible,
       modalLoading,
-      handleModalOk,
+      handleSave,
       treeSelectData,
       handleDelete,
       setDisable,
