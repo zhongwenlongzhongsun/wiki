@@ -21,6 +21,7 @@
           </p>
           <p>
           </p>
+          <!-- defaultExpandAllRows 默认展开左边列表， v-if 只有等到level1展示完所有数据再加载，a-table-->
           <a-table
               v-if="level1.length > 0"
               :columns="columns"
@@ -53,7 +54,7 @@
             </template>
           </a-table>
         </a-col>
-        <a-col :span="1489">
+        <a-col :span="14">
           <p>
             <a-form layout="inline" :model="param">
               <a-form-item>
@@ -162,7 +163,7 @@ export default defineComponent({
      * }]
      */
     const level1 = ref(); // 一级文档树，children属性就是二级文档
-    level1.value = [];
+    level1.value = []; //初始化level1，因为【v-if="level1.length > 0"】里初始level为空，会报错
 
     /**
      * 数据查询
