@@ -193,11 +193,14 @@ export default defineComponent({
 
     const treeSelectData = ref();
     treeSelectData.value = [];
-    const doc = ref({});
+    const doc = ref();
+    doc.value = {};
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleSave = () => {
       modalLoading.value = true;
+      editor.txt.html();
+      doc.value.content = editor.txt.html();
       axios.post("/doc/save", doc.value).then((response) => {
         modalLoading.value = false;
         const data = response.data; // data = commonResp
