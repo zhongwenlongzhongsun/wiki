@@ -44,12 +44,19 @@ public class DocController {
         return resp;
     }
 
-
     @DeleteMapping("/delete/{idsStr}")                     //resful风格
     public CommonResp delete(@PathVariable String idsStr) {//在使用axios提交post请求时，由于以json方式提交所以需要增加@RequestBody注解
         CommonResp resp = new CommonResp<>();
         List<String> list = Arrays.asList(idsStr.split(","));//将string转成list数组
         docService.delete(list);
+        return resp;
+    }
+
+    @GetMapping("/find-content/{id}")
+    public CommonResp findContent(@PathVariable Long id) { // 开启校验规则
+        CommonResp<String> resp = new CommonResp<>();
+        String content = docService.findContent(id);
+        resp.setContent(content);
         return resp;
     }
 }
