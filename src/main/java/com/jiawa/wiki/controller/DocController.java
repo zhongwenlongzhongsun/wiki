@@ -22,10 +22,10 @@ public class DocController {
     @Resource
     private DocService docService;
 
-    @GetMapping("/all")
-    public CommonResp all() { // 开启校验规则
+    @GetMapping("/all/{ebookId}")
+    public CommonResp all(@PathVariable Long ebookId) { // 开启校验规则
         CommonResp<List<DocQueryResp>> resp = new CommonResp<>();
-        List<DocQueryResp> list = docService.all();
+        List<DocQueryResp> list = docService.all(ebookId);
         resp.setContent(list);
         return resp;
     }
