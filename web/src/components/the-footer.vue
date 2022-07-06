@@ -1,6 +1,6 @@
 <template>
   <a-layout-footer style="text-align: center">
-    Ant Design ©2021 Created by ZhongSun
+    Ant Design Vue ©2022 Created by ZhongSun
   </a-layout-footer>
 </template>
 

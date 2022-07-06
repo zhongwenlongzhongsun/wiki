@@ -84,12 +84,21 @@
               <a-input v-model:value="doc.sort" placeholder="顺序"/>
             </a-form-item>
             <a-form-item>
+              <a-button type="primary" @click="handlePreviewContent()">
+                <EyeOutlined /> 内容预览
+              </a-button>
+            </a-form-item>
+            <a-form-item>
               <div id="content"></div>
             </a-form-item>
           </a-form>
         </a-col>
       </a-row>
 
+      <!--抽屉组件 -->
+      <a-drawer width="900" placement="right" :closable="false" :visible="drawerVisible" @close="onDrawerClose">
+        <div class="wangeditor" :innerHTML="previewHtml"></div>
+      </a-drawer>
 
     </a-layout-content>
   </a-layout>
@@ -201,7 +210,9 @@ export default defineComponent({
     // -------- 表单 ---------
 
     const doc = ref();
-    doc.value = {};
+    doc.value = {
+      ebookId: route.query.ebookId
+    };
     const modalVisible = ref(false);
     const modalLoading = ref(false);
     const handleSave = () => {
@@ -396,6 +407,21 @@ export default defineComponent({
       });
     };
 
+    // 富文本预览
+    const drawerVisible = ref(false);
+    const previewHtml = ref();
+
+    const handlePreviewContent = () => {
+      const html = editor.txt.html();
+      previewHtml.value = html;
+      drawerVisible.value = true;
+    }
+
+    const onDrawerClose = () => {
+      drawerVisible.value = false;
+    }
+
+
     onMounted(() => {
       createEditor();
       handleQuery();
@@ -418,6 +444,10 @@ export default defineComponent({
       modalVisible,
       handleSave,
       treeSelectData,
+      previewHtml,
+      drawerVisible,
+      handlePreviewContent,
+      onDrawerClose,
       handleDelete,
       setDisable,
       getDeleteIds
