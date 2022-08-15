@@ -4,16 +4,19 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.jiawa.wiki.domain.User;
 import com.jiawa.wiki.domain.UserExample;
+import com.jiawa.wiki.exception.BusinessException;
+import com.jiawa.wiki.exception.BusinessExceptionCode;
 import com.jiawa.wiki.mapper.UserMapper;
 import com.jiawa.wiki.req.UserQueryReq;
 import com.jiawa.wiki.req.UserSaveReq;
-import com.jiawa.wiki.resp.UserQueryResp;
 import com.jiawa.wiki.resp.PageResp;
+import com.jiawa.wiki.resp.UserQueryResp;
 import com.jiawa.wiki.util.CopyUtil;
 import com.jiawa.wiki.util.SnowFlake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
@@ -83,12 +86,19 @@ public class UserService {
     public void save(UserSaveReq req){
         User user = CopyUtil.copy(req, User.class);
         if(ObjectUtils.isEmpty(req.getId())){
-            //新增
-            user.setId(snowFlake.nextId());
-            userMapper.insert(user);
+            User userDB = selectByLoginName(req.getLoginName());
+            if(ObjectUtils.isEmpty(userDB)) {
+                //新增
+                user.setId(snowFlake.nextId());
+                userMapper.insert(user);
+            }else{
+                //用户名已存在
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            }
         }else{
-            //更新
-            userMapper.updateByPrimaryKey(user);
+            //更新 (修改时不更新用户名)
+            user.setLoginName(null);
+            userMapper.updateByPrimaryKeySelective(user);//里面属性有之才去更新，没值不更新
         }
     }
 
@@ -97,6 +107,21 @@ public class UserService {
      */
     public void delete(Long id){
         userMapper.deleteByPrimaryKey(id);
+    }
+
+    public User selectByLoginName(String LoginName){
+        UserExample userExample = new UserExample();
+        //createCriteria() 相当于where 条件
+        UserExample.Criteria criteria = userExample.createCriteria();
+        //如果传进name字段就按照name查找,否则模糊查询
+        criteria.andLoginNameEqualTo(LoginName);
+
+        List<User> userList = userMapper.selectByExample(userExample); //mybatis只能用list接收
+        if(CollectionUtils.isEmpty(userList)){
+            return null;
+        }else{
+            return userList.get(0);
+        }
     }
 
 }
