@@ -177,9 +177,7 @@ export default defineComponent({
     const modalLoading = ref(false);
     const handleModalOK = () => {
       modalLoading.value = true;
-
-      user.value.password = hexMd5(user.value.password + KEY);
-
+      user.value.password = hexMd5(user.value.password + KEY);//加密
       axios.post("/user/save", user.value).then((response) => {
         modalLoading.value = false;
         const data = response.data;  // data = commonResp
