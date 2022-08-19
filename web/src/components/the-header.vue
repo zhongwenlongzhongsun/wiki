@@ -1,6 +1,9 @@
 <template>
   <a-layout-header class="header">
     <div class="logo"/>
+    <a @click="showLoginModal" class="login-menu">
+      <span>登录</span>
+    </a>
     <a-menu
         theme="dark"
         mode="horizontal"
@@ -21,9 +24,7 @@
       <a-menu-item key="/about">
         <router-link to="/about"><AliwangwangOutlined />关于我们</router-link>
       </a-menu-item>
-      <a class="login-menu" @click="showLoginModal">
-        <span>登录</span>
-      </a>
+
     </a-menu>
 
     <a-modal
@@ -42,6 +43,7 @@
       </a-form>
     </a-modal>
   </a-layout-header>
+
 </template>
 
 <script lang="ts">
@@ -89,7 +91,7 @@ export default defineComponent({
       showLoginModal,
       login,
       loginUser
-    }
+    };
   },
   components: {
     AliwangwangOutlined,
@@ -100,8 +102,8 @@ export default defineComponent({
 </script>
 
 <style>
- .login-menu {
-   float: right;
+  .login-menu {
+   float: right !important;
    color: white;
  }
 </style>
