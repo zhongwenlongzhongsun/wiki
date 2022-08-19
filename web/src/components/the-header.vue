@@ -1,7 +1,10 @@
 <template>
   <a-layout-header class="header">
     <div class="logo"/>
-    <a @click="showLoginModal" class="login-menu">
+    <a class="login-menu" v-show="user.id">
+      <span>欢迎：{{ user.name }}</span>
+    </a>
+    <a class="login-menu" @click="showLoginModal" v-show="!user.id">
       <span>登录</span>
     </a>
     <a-menu
@@ -58,10 +61,17 @@ declare let KEY: any;
 export default defineComponent({
   name: 'the-header',
   setup() {
+
+    //登录后保存
+    const user = ref();
+    user.value = {};
+
+    //登录
     const loginUser = ref({
       loginName: "test",
-      password: "test"
+      password: "123"
     });
+
     const loginModalLoading = ref(false);
     const loginModalVisible = ref(false);
     const showLoginModal = () => {
@@ -79,6 +89,7 @@ export default defineComponent({
         if (data.success) {
           loginModalVisible.value = false;
           message.success("登录成功！")
+          user.value = data.content;
         } else {
           message.error(data.message);
         }
@@ -90,7 +101,8 @@ export default defineComponent({
       loginModalVisible,
       showLoginModal,
       login,
-      loginUser
+      loginUser,
+      user
     };
   },
   components: {
