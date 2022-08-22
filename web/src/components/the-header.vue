@@ -1,9 +1,10 @@
 <template>
   <a-layout-header class="header">
     <div class="logo"/>
-    <a class="login-menu" v-show="user.id">
-      <span>欢迎：{{ user.name }}</span>
-    </a>
+      <a class="login-menu"  v-show="user.id">
+        <span>欢迎：{{ user.name }}</span>
+      </a>
+
     <a class="login-menu" @click="showLoginModal" v-show="!user.id">
       <span>登录</span>
     </a>
@@ -50,10 +51,11 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from 'vue';
+import {computed, defineComponent, ref} from 'vue';
 import {AliwangwangOutlined, BookOutlined, HomeOutlined} from '@ant-design/icons-vue';
 import axios from "axios";
 import {message} from "ant-design-vue";
+import store from "@/store";
 
 declare let hexMd5: any;
 declare let KEY: any;
@@ -63,8 +65,9 @@ export default defineComponent({
   setup() {
 
     //登录后保存
-    const user = ref();
-    user.value = {};
+    const user = computed(() => store.state.user);
+    // const user = ref();
+    // user.value = {};
 
     //登录
     const loginUser = ref({
@@ -89,7 +92,8 @@ export default defineComponent({
         if (data.success) {
           loginModalVisible.value = false;
           message.success("登录成功！")
-          user.value = data.content;
+          // user.value = data.content;
+          store.commit("setUser", data.content);
         } else {
           message.error(data.message);
         }
