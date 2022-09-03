@@ -31,7 +31,13 @@ Accept: application/json
 
 ###
 
-GET http://localhost:8880/redis/get/215768452374335488
+GET http://localhost:8880/redis/get/216868475686227968
 Accept: application/json
 
+###
+
+POST http://localhost:8880/ebook/save
+Content-Type: application/json
+
+{}
 ###

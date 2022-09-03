@@ -1,13 +1,24 @@
 <template>
   <a-layout-header class="header">
     <div class="logo"/>
+
+      <a-popconfirm
+          title="确认退出登录?"
+          ok-text="是"
+          cancel-text="否"
+          @confirm="logout()"
+      >
+        <a class="login-menu" v-show="user.id">
+          <span>退出登录</span>
+        </a>
+      </a-popconfirm>
       <a class="login-menu"  v-show="user.id">
         <span>欢迎：{{ user.name }}</span>
       </a>
+      <a class="login-menu" @click="showLoginModal" v-show="!user.id">
+        <span>登录</span>
+      </a>
 
-    <a class="login-menu" @click="showLoginModal" v-show="!user.id">
-      <span>登录</span>
-    </a>
     <a-menu
         theme="dark"
         mode="horizontal"
@@ -86,7 +97,7 @@ export default defineComponent({
       console.log("开始登录");
       loginModalLoading.value = true;
       loginUser.value.password = hexMd5(loginUser.value.password + KEY);//加密
-      axios.post("/user/login", loginUser.value).then((response) => {
+      axios.post('/user/login', loginUser.value).then((response) => {
         loginModalLoading.value = false;
         const data = response.data;  // data = commonResp
         if (data.success) {
@@ -100,13 +111,28 @@ export default defineComponent({
       });
     };
 
+    // 退出登录
+    const logout = () => {
+      console.log("退出登录开始");
+      axios.get('/user/logout/' + user.value.token).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          message.success("退出登录成功！");
+          store.commit("setUser", {});
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
+
     return {
       loginModalLoading,
       loginModalVisible,
       showLoginModal,
       login,
       loginUser,
-      user
+      user,
+      logout
     };
   },
   components: {
@@ -121,5 +147,6 @@ export default defineComponent({
   .login-menu {
    float: right !important;
    color: white;
+    padding-left: 20px;
  }
 </style>

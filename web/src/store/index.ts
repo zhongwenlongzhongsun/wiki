@@ -3,7 +3,7 @@ import {createStore} from 'vuex'
 declare let SessionStorage: any;
 const USER = "USER";
 
-const store = createStore({
+const store = createStore ({
   state: {
     //避免空对象，刷新时加载store，在缓存里获取
     user: SessionStorage.get(USER) || {}
