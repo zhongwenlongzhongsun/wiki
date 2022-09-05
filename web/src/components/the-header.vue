@@ -28,13 +28,13 @@
         <router-link to="/"><HomeOutlined />首页</router-link>
       </a-menu-item>
       <a-menu-item key="/admin/user">
-        <router-link to="/admin/user"><BookOutlined />用户管理</router-link>
+        <router-link to="/admin/user" :style="user.id? {} : {display:'none'}"><BookOutlined />用户管理</router-link>
       </a-menu-item>
       <a-menu-item key="/admin/ebook">
-        <router-link to="/admin/ebook"><BookOutlined />电子书管理</router-link>
+        <router-link to="/admin/ebook" :style="user.id? {} : {display:'none'}"><BookOutlined />电子书管理</router-link>
       </a-menu-item>
-      <a-menu-item key="/admin/category">
-        <router-link to="/admin/category"><BookOutlined />分类管理</router-link>
+      <a-menu-item key="/admin/category" >
+        <router-link to="/admin/category" :style="user.id? {} : {display:'none'}"><BookOutlined />分类管理</router-link>
       </a-menu-item>
       <a-menu-item key="/about">
         <router-link to="/about"><AliwangwangOutlined />关于我们</router-link>
@@ -67,6 +67,7 @@ import {AliwangwangOutlined, BookOutlined, HomeOutlined} from '@ant-design/icons
 import axios from "axios";
 import {message} from "ant-design-vue";
 import store from "@/store";
+import router from "@/router";
 
 declare let hexMd5: any;
 declare let KEY: any;
@@ -114,11 +115,13 @@ export default defineComponent({
     // 退出登录
     const logout = () => {
       console.log("退出登录开始");
+
       axios.get('/user/logout/' + user.value.token).then((response) => {
         const data = response.data;
         if (data.success) {
           message.success("退出登录成功！");
           store.commit("setUser", {});
+          router.push("/");//退出登录重定向到首页
         } else {
           message.error(data.message);
         }
