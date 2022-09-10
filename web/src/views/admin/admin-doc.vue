@@ -7,11 +7,11 @@
         <a-col :span="10">
           <p>
             <a-form layout="inline" :model="param">
-              <a-form-item>
-                <a-button type="primary" @click="handleQuery()">
-                  查询
-                </a-button>
-              </a-form-item>
+<!--              <a-form-item>-->
+<!--                <a-button type="primary" @click="handleQuery()">-->
+<!--                  查询-->
+<!--                </a-button>-->
+<!--              </a-form-item>-->
               <a-form-item>
                 <a-button type="primary" @click="add()">
                   新增
@@ -65,9 +65,11 @@
             </a-form>
           </p>
           <a-form :model="doc" layout="vertical">
+
             <a-form-item>
               <a-input v-model:value="doc.name" placeholder="名称"/>
             </a-form-item>
+
             <a-form-item>
               <a-tree-select
                   v-model:value="doc.parent"
@@ -77,12 +79,15 @@
                   placeholder="请选择父文档"
                   tree-default-expand-all
                   :replaceFields="{title: 'name', key: 'id', value: 'id'}"
+
               >
               </a-tree-select>
             </a-form-item>
+
             <a-form-item>
               <a-input v-model:value="doc.sort" placeholder="顺序"/>
             </a-form-item>
+
             <a-form-item>
               <a-button type="primary" @click="handlePreviewContent()">
                 <EyeOutlined /> 内容预览

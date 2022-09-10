@@ -15,6 +15,14 @@
           </a-tree>
         </a-col>
         <a-col :span="18">
+          <div>
+            <h2>{{doc.name}}</h2>
+            <div>
+              <span>阅读数：{{doc.viewCount}}</span>&nbsp;&nbsp;
+              <span>点赞数：{{doc.voteCount}}</span>
+            </div>
+            <a-divider style="height: 3px; background-color: aqua"/>
+          </div>
           <div class="wangeditor" :innerHtml="html"></div>
         </a-col>
       </a-row>
@@ -152,6 +160,8 @@ export default defineComponent({
           if (Tool.isNotEmpty(level1)){
             defaultSelectedKeys.value = [level1.value[0].id];//将该节点设置为选中状态
             handleQueryContent(level1.value[0].id);//根据该节点查内容
+            //初始显示文档信息
+            doc.value = level1.value[0];
           }
         } else {
           message.error(data.message);
@@ -163,6 +173,10 @@ export default defineComponent({
     const onSelect = (SelectedKeys: any, info: any) => {
       console.log('selected', SelectedKeys , info);
       if (Tool.isNotEmpty(SelectedKeys)){
+        //选中某节点，加载该节点文档信息
+        doc.value = info.selectedNotes[0].props;
+
+        doc.value.viewCount = doc.value.viewCount + 1;
         //加载第一个内容
         handleQueryContent(SelectedKeys[0]);
       }
@@ -176,7 +190,8 @@ export default defineComponent({
       level1,
       html,
       onSelect,
-      defaultSelectedKeys
+      defaultSelectedKeys,
+      doc
     }
   }
 });

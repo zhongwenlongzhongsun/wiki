@@ -2,13 +2,16 @@ package com.jiawa.wiki.mapper;
 
 import com.jiawa.wiki.domain.Doc;
 import com.jiawa.wiki.domain.DocExample;
-import java.util.List;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface DocMapper {
     long countByExample(DocExample example);
 
-    int deleteByExample(DocExample example);
+    static int deleteByExample(DocExample example) {
+        return 1;
+    }
 
     int deleteByPrimaryKey(Long id);
 

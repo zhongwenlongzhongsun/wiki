@@ -105,6 +105,10 @@ public class CategoryService {
      */
     public void delete(Long id){
         categoryMapper.deleteByPrimaryKey(id);
+        CategoryExample categoryExample = new CategoryExample();//删除目录时不同时删除关联文档
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
+        criteria.andIdEqualTo(id);
+        CategoryMapper.deleteByExample(categoryExample);
     }
 
 }

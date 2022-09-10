@@ -2,8 +2,10 @@ package com.jiawa.wiki.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.jiawa.wiki.domain.DocExample;
 import com.jiawa.wiki.domain.Ebook;
 import com.jiawa.wiki.domain.EbookExample;
+import com.jiawa.wiki.mapper.DocMapper;
 import com.jiawa.wiki.mapper.EbookMapper;
 import com.jiawa.wiki.req.EbookQueryReq;
 import com.jiawa.wiki.req.EbookSaveReq;
@@ -100,6 +102,10 @@ public class EbookService {
      */
     public void delete(Long id){
         ebookMapper.deleteByPrimaryKey(id);
+        DocExample docExample = new DocExample();//删除电子书时不同时删除关联文档
+        DocExample.Criteria criteria = docExample.createCriteria();
+        criteria.andEbookIdEqualTo(id);
+        DocMapper.deleteByExample(docExample);
     }
 
 }

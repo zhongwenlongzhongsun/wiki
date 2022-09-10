@@ -9,7 +9,9 @@ import java.util.List;
 public interface CategoryMapper {
     long countByExample(CategoryExample example);
 
-    int deleteByExample(CategoryExample example);
+    static int deleteByExample(CategoryExample example){
+        return 1;
+    }
 
     int deleteByPrimaryKey(Long id);
 

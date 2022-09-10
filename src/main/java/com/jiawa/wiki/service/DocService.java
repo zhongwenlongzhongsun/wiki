@@ -7,6 +7,7 @@ import com.jiawa.wiki.domain.Doc;
 import com.jiawa.wiki.domain.DocExample;
 import com.jiawa.wiki.mapper.ContentMapper;
 import com.jiawa.wiki.mapper.DocMapper;
+import com.jiawa.wiki.mapper.DocMapperCust;
 import com.jiawa.wiki.req.DocQueryReq;
 import com.jiawa.wiki.req.DocSaveReq;
 import com.jiawa.wiki.resp.DocQueryResp;
@@ -26,9 +27,11 @@ public class DocService {
 
     private static final Logger LOG = LoggerFactory.getLogger((DocService.class));
 
-//    @Autowired
     @Resource
     private DocMapper docMapper;
+
+    @Resource
+    private DocMapperCust docMapperCust;
 
     @Resource
     private ContentMapper contentMapper;
@@ -101,8 +104,11 @@ public class DocService {
         if(ObjectUtils.isEmpty(req.getId())){
             //新增
             doc.setId(snowFlake.nextId());
+            //初始化阅读数与点赞数
+            doc.setViewCount(0);
+            doc.setVoteCount(0);
             docMapper.insert(doc);
-            //由于//doc.id==content.id，所以前面新增setId，这里content就getId
+            //由于       //doc.id==content.id，所以前面新增setId，这里content就getId
             content.setId(doc.getId());
             contentMapper.insert(content);
         }else{
@@ -130,11 +136,14 @@ public class DocService {
         DocExample docExample = new DocExample();
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andIdIn(ids);
-        docMapper.deleteByExample(docExample);
+        DocMapper.deleteByExample(docExample);
     }
 
     public String findContent(Long id){
         Content content = contentMapper.selectByPrimaryKey(id);
+        //阅读数 +1
+        docMapperCust.increaseViewCount(id);
+
         if(ObjectUtils.isEmpty(content)){
             return "";
         } else {

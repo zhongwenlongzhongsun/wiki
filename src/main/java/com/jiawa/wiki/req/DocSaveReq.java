@@ -1,24 +1,24 @@
 package com.jiawa.wiki.req;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 public class DocSaveReq {
     private Long id;
 
-    @NotEmpty(message="电子书不能为空")
+    @NotNull(message="电子书不能为空")
     private Long ebookId;
-    @NotEmpty(message="父文档不能为空")
+    @NotNull(message="父文档不能为空")
     private Long parent;
-    @NotEmpty(message="名称不能为空")
+    @NotNull(message="名称不能为空")
     private String name;
-    @NotEmpty(message="顺序不能为空")
+    @NotNull(message="顺序不能为空")
     private Integer sort;
 
     private Integer viewCount;
 
     private Integer voteCount;
 
-    @NotEmpty(message="内容不能为空")
+    @NotNull(message="内容不能为空")
     private String content;
 
     public String getContent() {
