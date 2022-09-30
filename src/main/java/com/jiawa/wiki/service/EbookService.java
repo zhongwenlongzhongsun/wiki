@@ -106,6 +106,8 @@ public class EbookService {
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andEbookIdEqualTo(id);
         DocMapper.deleteByExample(docExample);
+//        DocMapper.deleteByExample(content);
+
     }
 
 }

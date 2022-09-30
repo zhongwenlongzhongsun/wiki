@@ -51,7 +51,7 @@
                 cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
-              <a-button type="danger">
+              <a-button type="primary" danger>
                 删除
               </a-button>
             </a-popconfirm>
@@ -69,7 +69,7 @@
   >
     <a-form :model="ebook" :label-col="{ span: 6}" :wrapper-col="{span: 18}">
       <a-form-item label="封面">
-        <a-input v-model:value="ebook.cover" />
+        <a-input v-model:value="ebook['cover']" />
       </a-form-item>
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name" />

@@ -46,7 +46,7 @@
                     cancel-text="否"
                     @confirm="handleDelete(record.id)"
                 >
-                  <a-button type="danger" size="small">
+                  <a-button type="primary" size="small" danger>
                     删除
                   </a-button>
                 </a-popconfirm>
@@ -72,7 +72,7 @@
 
             <a-form-item>
               <a-tree-select
-                  v-model:value="doc.parent"
+                  v-model:value="doc['parent']"
                   style="width: 100%"
                   :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
                   :tree-data="treeSelectData"
@@ -85,7 +85,7 @@
             </a-form-item>
 
             <a-form-item>
-              <a-input v-model:value="doc.sort" placeholder="顺序"/>
+              <a-input v-model:value="doc['sort']" placeholder="顺序"/>
             </a-form-item>
 
             <a-form-item>
@@ -129,6 +129,7 @@ import E from 'wangeditor';
 
 export default defineComponent({
   name: 'AdminDoc',
+
   setup() {
 
     const route = useRoute();

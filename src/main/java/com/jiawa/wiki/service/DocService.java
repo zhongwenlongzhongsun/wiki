@@ -5,6 +5,8 @@ import com.github.pagehelper.PageInfo;
 import com.jiawa.wiki.domain.Content;
 import com.jiawa.wiki.domain.Doc;
 import com.jiawa.wiki.domain.DocExample;
+import com.jiawa.wiki.exception.BusinessException;
+import com.jiawa.wiki.exception.BusinessExceptionCode;
 import com.jiawa.wiki.mapper.ContentMapper;
 import com.jiawa.wiki.mapper.DocMapper;
 import com.jiawa.wiki.mapper.DocMapperCust;
@@ -13,6 +15,8 @@ import com.jiawa.wiki.req.DocSaveReq;
 import com.jiawa.wiki.resp.DocQueryResp;
 import com.jiawa.wiki.resp.PageResp;
 import com.jiawa.wiki.util.CopyUtil;
+import com.jiawa.wiki.util.RedisUtil;
+import com.jiawa.wiki.util.RequestContext;
 import com.jiawa.wiki.util.SnowFlake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,9 @@ public class DocService {
 
     @Resource
     private SnowFlake snowFlake;
+
+    @Resource
+    public RedisUtil redisUtil;
 
     /**
      *     根据名字模糊查询
@@ -150,4 +157,20 @@ public class DocService {
             return content.getContent();
         }
     }
+
+    /**
+     *  点赞
+     */
+    public void vote(Long id){
+        //获取到远程IP
+        String ip = RequestContext.getRemoteAddr();
+        //通过远程 IP + doc.id 作为key,且24 小时内不能重复
+        if (redisUtil.validateRepeat("Doc_Vote_" + id + "_" + ip, 3600 * 24)){
+            docMapperCust.increaseVoteCount(id);
+        } else {
+            throw new BusinessException(BusinessExceptionCode.VOTE_REPEAT);
+        }
+    }
+
+
 }

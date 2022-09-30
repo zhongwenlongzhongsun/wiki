@@ -6,7 +6,7 @@
       <p>
         <a-form layout="inline" :model="param">
           <a-form-item>
-            <a-input v-model:value="param.loginName" placeholder="登录名" >
+            <a-input v-model:value="param['loginName']" placeholder="登录名" >
             </a-input>
           </a-form-item>
           <a-form-item>
@@ -43,7 +43,7 @@
                 cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
-              <a-button type="danger">
+              <a-button type="primary" danger>
                 删除
               </a-button>
             </a-popconfirm>
@@ -61,13 +61,13 @@
   >
     <a-form :model="user" :label-col="{ span: 6}" :wrapper-col="{span: 18}">
       <a-form-item label="登录名">
-        <a-input v-model:value="user.loginName" :disabled="!!user.id"/>
+        <a-input v-model:value="user['loginName']" :disabled="!!user.id"/>
       </a-form-item>
       <a-form-item label="昵称">
         <a-input v-model:value="user.name" />
       </a-form-item>
       <a-form-item label="密码" v-show="!user.id" >
-        <a-input v-model:value="user.password"/>
+        <a-input v-model:value="user['password']"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -80,7 +80,7 @@
   >
     <a-form :model="user" :label-col="{ span: 6}" :wrapper-col="{span: 18}">
       <a-form-item label="新密码">
-        <a-input v-model:value="user.password"/>
+        <a-input v-model:value="user['password']"/>
       </a-form-item>
     </a-form>
   </a-modal>

@@ -24,6 +24,12 @@
             <a-divider style="height: 3px; background-color: aqua"/>
           </div>
           <div class="wangeditor" :innerHtml="html"></div>
+
+          <div class="vote-div">
+            <a-button type="primary" shape="round" :size="'large'" @click="vote">
+              <template #icon><LikeOutlined/> &nbsp;点赞: {{doc.voteCount}} </template>
+            </a-button>
+          </div>
         </a-col>
       </a-row>
     </a-layout-content>
@@ -89,7 +95,11 @@
   font-size: 16px !important;
   font-weight:600;
 }
-
+/* 点赞 */
+.vote-div{
+  padding: 15px;
+  text-align: center;
+}
 </style>
 
 
@@ -170,17 +180,31 @@ export default defineComponent({
     };
 
     //SelectedKeys是数组
-    const onSelect = (SelectedKeys: any, info: any) => {
+    const onSelect = (SelectedKeys : any, info: any) => {
       console.log('selected', SelectedKeys , info);
       if (Tool.isNotEmpty(SelectedKeys)){
         //选中某节点，加载该节点文档信息
-        doc.value = info.selectedNotes[0].props;
+        // doc.value = info.selectedNotes[0].props;
+        doc.value = info.selectedNodes[0].props;
+        console.log(info);
 
         doc.value.viewCount = doc.value.viewCount + 1;
         //加载第一个内容
         handleQueryContent(SelectedKeys[0]);
       }
     }
+
+    //点赞
+    const vote = () =>{
+      axios.get('/doc/vote/' + doc.value.id).then((response) =>{
+        const data = response.data;
+        if (data.success){
+          doc.value.voteCount++;
+        } else {
+          message.error(data.message);
+        }
+      });
+    };
 
     onMounted(() => {
       handleQuery();
@@ -191,7 +215,8 @@ export default defineComponent({
       html,
       onSelect,
       defaultSelectedKeys,
-      doc
+      doc,
+      vote
     }
   }
 });

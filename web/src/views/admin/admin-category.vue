@@ -48,7 +48,7 @@
                 cancel-text="否"
                 @confirm="handleDelete(record.id)"
             >
-              <a-button type="danger">
+              <a-button type="primary" danger>
                 删除
               </a-button>
             </a-popconfirm>
@@ -70,24 +70,24 @@
       </a-form-item>
       <a-form-item label="父分类">
         <a-select
-            v-model:value="category.parent"
+            v-model:value="category['parent']"
             ref="select"
         >
           <a-select-option :value="0">
             无
           </a-select-option>
-          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="category.id === c.id">
+          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="category['id'] === c.id">
             {{c.name}}
           </a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item label="顺序">
-        <a-input v-model:value="category.sort" />
+        <a-input v-model:value="category['sort']" />
       </a-form-item>
     </a-form>
   </a-modal>
 </template>
-
+2
 <script lang="ts">
 import {defineComponent, onMounted, ref} from 'vue';
 import axios from 'axios';
